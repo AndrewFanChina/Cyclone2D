@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.6.5
+Created-By: 1.6.0-beta2-b86 (Sun Microsystems Inc.)
+MIDlet-1: SkyForce,/icons/icon_46x48.png,engine.midlet.nokia7650.Start
+MIDlet-Vendor: Infinite Dreams/BiNPDA
+MIDlet-Version: 1.08
+MIDlet-Name: SkyForce
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0
+Build-Date: 1437 November 8 2006

@@ -1,0 +1,13 @@
+host PrintString (p0);
+host Speak(p0);
+func _Main()
+{
+	var a;
+	a++;
+	var i;
+	i=0;
+	for(i=0;i<100;i++)
+	{
+		PrintString("_______"$i$"__");
+	}
+} 

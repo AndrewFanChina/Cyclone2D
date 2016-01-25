@@ -1,0 +1,40 @@
+8
+
+dir
+38
+http://192.168.1.200:5555/svn/Sword/Swrord/sns/sns/model/rank
+http://192.168.1.200:5555/svn/Sword
+
+
+
+2013-05-20T08:30:31.962216Z
+2
+Andrew
+
+
+svn:special svn:externals svn:needs-lock
+
+C2D_RankList.java
+file
+
+
+
+
+2013-05-03T01:41:39.991933Z
+8b27a6aca38d1e799a0a6696393f899d
+2013-05-20T08:30:31.962216Z
+2
+Andrew
+
+C2D_RankItem.java
+file
+
+
+
+
+2013-05-17T09:23:00.564946Z
+178ffca9bdc53e422f1adfa79d9df318
+2013-05-20T08:30:31.962216Z
+2
+Andrew
+

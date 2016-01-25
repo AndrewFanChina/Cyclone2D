@@ -1,0 +1,413 @@
+package sns.model.record;
+
+import c2d.app.C2D_App;
+
+
+/**
+ * 本地记录类，将记录写入到本地，对于Android来说，写到本地文件中，对于J2me来说，写到RMS中
+ */
+public class C2D_LocalRecord
+{
+	private static final String PrefixName = "rd_";
+	private static final String SubfixName = ".bin";
+
+	/**
+	 * 保存游戏记录集合，将游戏记录集合转换成字符串保存到服务器。
+	 * 
+	 * @return 是否成功保存，只要有一个保存失败就会返回失败
+	 */
+	public static boolean saveRecordSet(C2D_RecordSet record)
+	{
+		if (record == null)
+		{
+			return false;
+		}
+		boolean success = true;
+		for (int i = 0; i < record.size(); i++)
+		{
+			C2D_RecordItem recordItem = record.getRecordByID(i);
+			if (recordItem != null)
+			{
+				if (!saveRecord(recordItem))
+				{
+					success = false;
+				}
+			}
+		}
+		return success;
+	}
+
+	/**
+	 * 加载游戏记录集合，将自动获取已经被创建的游戏记录集合。
+	 * 
+	 * @return 读取到的记录集合
+	 */
+	public static C2D_RecordSet loadRecordSet()
+	{
+		C2D_RecordSet rcordSet = new C2D_RecordSet();
+		for (int i = 1; i <= 6; i++)
+		{
+			C2D_RecordItem record = new C2D_RecordItem(i);
+			String urlI = PrefixName + i + SubfixName;
+			String data = readLocal(urlI);
+			if (data != null && record.serializeIn(data))
+			{
+				rcordSet.addRecord(record);
+			}
+		}
+		return rcordSet;
+	}
+
+	/**
+	 * 删除游戏记录集合，将根据游戏记录集合中的每条记录ID删除响应的记录
+	 * 
+	 * @return 被删除的条数
+	 */
+	public static int removeRecordSet(C2D_RecordSet record)
+	{
+		if (record == null)
+		{
+			return 0;
+		}
+		int count = 0;
+		for (int i = 0; i < record.size(); i++)
+		{
+			C2D_RecordItem recordItem = record.getRecordByID(i);
+			if (recordItem != null)
+			{
+				if (removeRecord(recordItem))
+				{
+					count++;
+				}
+			}
+		}
+		return count;
+	}
+
+	/**
+	 * 保存单项游戏记录。
+	 * 
+	 * @param record
+	 *            单项记录
+	 * @return 是否成功保存
+	 */
+	public static boolean saveRecord(C2D_RecordItem record)
+	{
+		if (record == null)
+		{
+			return false;
+		}
+		String urlI = PrefixName + record.getRecordID() + SubfixName;
+		String data = record.serializeOut();
+		return writeLocal(urlI, data);
+	}
+
+	/**
+	 * 加载单项游戏记录，根据游戏记录ID获取相应的记录。
+	 * 
+	 * @param record
+	 *            单项记录
+	 * @return 是否成功获取
+	 */
+	public static boolean loadRecord(C2D_RecordItem record)
+	{
+		if (record == null)
+		{
+			return false;
+		}
+		String urlI = PrefixName + record.getRecordID() + SubfixName;
+		String data = readLocal(urlI);
+		if (data != null && record.serializeIn(data))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 删除单项游戏记录。
+	 * 
+	 * @param record
+	 *            单项记录
+	 * @return 是否删除保存
+	 */
+	public static boolean removeRecord(C2D_RecordItem record)
+	{
+		if (record == null)
+		{
+			return false;
+		}
+		String urlI = PrefixName + record.getRecordID() + SubfixName;
+		return removeLocal(urlI);
+	}
+
+	/**
+	 * 读取记录，返回记录字符串
+	 * 
+	 * @param rName
+	 *            记录名称
+	 * @return String 读取到的记录字符串
+	 */
+	private static final String readLocal(String rName)
+	{
+		//#if Platform == "Android"
+//@		java.io.FileInputStream in = null;
+//@		String strValue = null;
+//@		try
+//@		{
+//@			byte byteData[] = null;
+//@			in = C2D_App.getApp().openFileInput(rName);
+//@			if (in != null)
+//@			{
+//@				int len = in.available();
+//@				byteData = new byte[len];
+//@				in.read(byteData);
+//@			}
+//@			if (byteData != null)
+//@			{
+//@				strValue = new String(byteData);
+//@			}
+//@		}
+//@		catch (Exception ex)
+//@		{
+//@			ex.printStackTrace();
+//@		}
+//@		finally
+//@		{
+//@			if (in != null)
+//@			{
+//@				try
+//@				{
+//@					in.close();
+//@					in = null;
+//@				}
+//@				catch (Exception e)
+//@				{
+//@				}
+//@			}
+//@		}
+//@		return strValue;
+		//#else
+
+		String strValue = null;
+		javax.microedition.rms.RecordStore store = null;
+		try
+		{
+			byte byteData[] = null;
+			store = javax.microedition.rms.RecordStore.openRecordStore(rName, false);
+			byteData = store.getRecord(1);
+
+			if (byteData != null)
+			{
+				strValue = new String(byteData,"utf-8");
+			}
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
+		finally
+		{
+			if (store != null)
+			{
+				try
+				{
+					store.closeRecordStore();
+					store = null;
+				}
+				catch (Exception e)
+				{
+				}
+			}
+		}
+		return strValue;
+		//#endif
+	}
+
+	/**
+	 * 写出记录到本地
+	 * 
+	 * @param rName
+	 *            记录名称
+	 * @param data
+	 *            记录数据
+	 */
+	public static final boolean writeLocal(String rName, String str)
+	{
+		if (str == null || str.length() == 0)
+		{
+			return false;
+		}
+		//#if Platform == "Android"
+//@		byte data[] = str.getBytes();
+//@		java.io.FileOutputStream out = null;
+//@		boolean success = false;
+//@		try
+//@		{
+//@			out = C2D_App.getApp().openFileOutput(rName,  android.content.Context.MODE_PRIVATE);
+//@			if (out != null)
+//@			{
+//@				out.write(data);
+//@			}
+//@			success = true;
+//@		}
+//@		catch (Exception ex)
+//@		{
+			// #debug
+//@			ex.printStackTrace();
+			// #enddebug
+//@		}
+//@		finally
+//@		{
+//@			if (out != null)
+//@			{
+//@				try
+//@				{
+//@					out.close();
+//@					out = null;
+//@				}
+//@				catch (Exception e)
+//@				{
+//@				}
+//@			}
+//@		}
+//@		return success;
+		//#else
+		javax.microedition.rms.RecordStore store = null;
+		boolean success = false;
+		try
+		{
+			boolean create = testLocal(rName);
+			store = javax.microedition.rms.RecordStore.openRecordStore(rName, true);
+			byte data[] = str.getBytes("utf-8");
+			if (!create)
+			{
+				store.addRecord(data, 0, data.length); // 建立
+			}
+			else
+			{
+				store.setRecord(1, data, 0, data.length); // 更改
+			}
+			success = true;
+		}
+		catch (Exception ex)
+		{
+			// #debug
+			ex.printStackTrace();
+			// #enddebug
+		}
+		finally
+		{
+			if (store != null)
+			{
+				try
+				{
+					store.closeRecordStore();
+					store = null;
+				}
+				catch (Exception e)
+				{
+				}
+			}
+		}
+		return success;
+		//#endif
+	}
+
+	/**
+	 * 检查记录是否存在
+	 * 
+	 * @param rName
+	 *            记录名称
+	 * @return 返回是否存在
+	 */
+	private static final boolean testLocal(String rName)
+	{
+		//#if Platform == "Android"
+//@		int data = 0;
+//@		try
+//@		{
+//@			java.io.FileInputStream in = C2D_App.getApp().openFileInput(rName);
+//@			if (in != null)
+//@			{
+//@				data = in.available();
+//@			}
+//@		}
+//@		catch (Exception e)
+//@		{
+//@			data=-1;
+//@		}
+//@		return data >= 0;
+		//#else
+		int data = 0;
+		javax.microedition.rms.RecordStore store = null;
+		try
+		{
+			store = javax.microedition.rms.RecordStore.openRecordStore(rName, false);
+			data = store.getNumRecords();
+			store.closeRecordStore();
+		}
+		catch (Exception e)
+		{
+			data = -1;
+		}
+		finally
+		{
+			if (store != null)
+			{
+				try
+				{
+					store.closeRecordStore();
+					store = null;
+				}
+				catch (Exception e)
+				{
+				}
+			}
+		}
+		return data > 0;
+		//#endif
+	}
+
+	/**
+	 * 删除记录
+	 * 
+	 * @param rName
+	 *            记录名称
+	 */
+	private static final boolean removeLocal(String rName)
+	{
+		//#if Platform == "Android"
+//@		try
+//@		{
+//@			if (!testLocal(rName))
+//@			{
+//@				return false;
+//@			}
+//@			C2D_App.getApp().deleteFile(rName);
+//@			return true;
+//@		}
+//@		catch (Exception e)
+//@		{
+//@			e.printStackTrace();
+//@		}
+//@		return false;
+		//#else
+		try
+		{
+			if (!testLocal(rName))
+			{
+				return false;
+			}
+			javax.microedition.rms.RecordStore.deleteRecordStore(rName);
+			return true;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return false;
+		//#endif
+	}
+
+}

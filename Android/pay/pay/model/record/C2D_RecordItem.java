@@ -1,0 +1,638 @@
+package pay.model.record;
+
+import c2d.util.misc.C2D_MiscUtil;
+
+/**
+ * 游戏记录类 它含有三个属性：记录ID、记录描述、记录内容。其中记录ID是用户定义的，
+ * 当从一条字符串数据构建游戏记录时，其中以"$"进行分隔成两个部分，
+ * 它们分别是内容描述和记录内容，游戏记录内容数据个数不限，数据之间以"$"进行分隔。
+ * 创建多个记录对象时，不能传入重复的ID，否则后面从记录集获取相应的记录将产生问题。
+ * 你可以从记录内容中一点点读取信息，使用readXXX()。也可以而一点点写入信息到记录内容，
+ * 使用writeXXX()。 所有读取和写入操作的内容都在内部以 字符串的形式运作。
+ * 关于记录ID和条数：
+ * 因为平台限制，记录ID取[1-3]为好，因为ZSJ支持最多6条，GDXC支持最多3条，
+ * SQ本身不限，被约束为6条。
+ * 关于限制字符：
+ * GDXC要求内容不可有字符'|'和'&'，ZSJ要求内容不能有'#'，否则会出错，
+ * SQ中的中文正常，没有限制的字符。总结来说，加上我们自己使用的分隔符'$'，
+ * 共计4个分隔符不能使用，分别是'|'、'&'、'#','$'。
+ * 另外，'+'在GDXC会被替换成空白。
+ * 关于全局记录：
+ * 全局记录即游戏的唯一记录，它被本游戏的所有玩家所共享，GDXC、SQ均不支持全局记录。
+ * ZSJ支持全局记录，但是全局记录中不能含有中文。
+ * 
+ * @author AndrewFan
+ * 
+ */
+public class C2D_RecordItem
+{
+	/** 记录内容之间的分隔符 */
+	private static final char SEP = '$';
+	private static final char ForbiddenList[]={'|','&','#','%'};
+	private int m_recordID=1;
+	private String m_desc = "";
+	private String m_content="";
+	private int m_readPos;
+	/**
+	 * 构建新的游戏记录
+	 * @param recordID 记录ID，从1开始，一般不超过三个，即取[1-3]为好。
+	 */
+	public C2D_RecordItem(int recordID)
+	{
+		setRecordID(recordID);
+		setDescription(recordID+"");
+	}
+	/**
+	 * 构建新的游戏记录
+	 * @param recordID 记录ID
+	 * @param desc 记录内容
+	 */
+	public C2D_RecordItem(int recordID, String desc)
+	{
+		setRecordID(recordID);
+		setDescription(desc);
+	}
+	/**
+	 * 设置记录ID
+	 * @param recordID
+	 */
+	private void setRecordID(int recordID)
+	{
+		m_recordID = recordID;
+		if(m_recordID<1||m_recordID>6)
+		{
+			C2D_MiscUtil.log("<Warnning>", "记录ID超出");
+		}
+	}
+
+	/**
+	 * 设置描述
+	 * 
+	 * @param desc
+	 */
+	public void setDescription(String desc)
+	{
+		if (desc != null)
+		{
+			m_desc = desc;
+		}
+	}
+
+	/**
+	 * 获取描述
+	 * 
+	 * @return 描述
+	 */
+	public String getDescription()
+	{
+		return m_desc;
+	}
+
+	/**
+	 * 获取记录内容
+	 * 
+	 * @return 记录内容
+	 */
+	public String getContent()
+	{
+		if(m_content!=null&&m_content.length()>0)
+		{
+			return m_content.toString();
+		}
+		return null;
+	}
+
+	/**
+	 * 设置记录内容，设置内容之后，记录位置会重置。
+	 * 
+	 * @param content
+	 */
+	public void setContent(String content)
+	{
+		if (content != null)
+		{
+			m_content=content;
+			resetReadPos();
+		}
+	}
+	
+	/**
+	 * 获得记录ID
+	 * @return 记录ID
+	 */
+	public int getRecordID()
+	{
+		return m_recordID;
+	}
+	/**
+	 * 将记录数据串行化输出，转换成字符串【记录描述+分隔符+记录内容】
+	 * 
+	 * @return 串行化字符串
+	 */
+	public String serializeOut()
+	{
+		//检查是否含有非法字符
+		if(cotainsFBC(m_desc,ForbiddenList))
+		{
+			C2D_MiscUtil.log("<Error>","记录描述含有非法字符");
+		}
+		if(cotainsFBC(m_content,ForbiddenList))
+		{
+			C2D_MiscUtil.log("<Error>","记录描述含有非法字符");
+		}
+		return m_desc + SEP + m_content;
+	}
+	/**
+	 * 检查字符串是否含有非法字符
+	 * @param word 被检查的字符串
+	 * @param forbiddenList 禁止字符列表
+	 * @return 是否含有
+	 */
+	private boolean cotainsFBC(String word,char forbiddenList[])
+	{
+		if(m_content==null)
+		{
+			return false;
+		}
+		for (int i = 0; i < forbiddenList.length; i++)
+		{
+			if(word.indexOf(forbiddenList[i])>=0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	/**
+	 * 将数据串行化输入，转换并设置记录描述、记录内容
+	 * 
+	 * @return 是否输入成功
+	 */
+	public boolean serializeIn(String data)
+	{
+		if(data==null)
+		{
+			return false;
+		}
+		int index=data.indexOf(SEP);
+		if(index<0)
+		{
+			return false;
+		}
+		String s1=data.substring(0,index);
+		String s2=data.substring(index+1,data.length());
+		setDescription(s1);
+		setContent(s2);
+		return true;
+	}
+	/**
+	 * 写出整形数值
+	 * 
+	 * @param value
+	 *            整形数值
+	 */
+	public void writeInt(int value)
+	{
+		m_content+=value;
+		m_content+=SEP;
+	}
+
+	/**
+	 * 读取整形数值，如果读取失败，会返回-1，并产生异常信息
+	 * 
+	 * @return 整形数值
+	 */
+	public int readInt()
+	{
+		int value = -1;
+		String chunck = nextChunck();
+		if (chunck != null)
+		{
+			try
+			{
+				value = Integer.parseInt(chunck);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return value;
+	}
+
+	/**
+	 * 写出整形数值数组
+	 * 
+	 * @param value
+	 *            整形数值数组
+	 */
+	public void writeInts(int value[])
+	{
+		if (value == null)
+		{
+			return;
+		}
+		writeInt(value.length);
+		for (int i = 0; i < value.length; i++)
+		{
+			writeInt(value[i]);
+		}
+	}
+
+	/**
+	 * 读取整形数值数组
+	 * 
+	 * @param 整形数组
+	 *            ，如果读取失败则返回空
+	 */
+	public int[] readInts()
+	{
+		int length = readInt();
+		if (length < 0)
+		{
+			return null;
+		}
+		int[] value = new int[length];
+		for (int i = 0; i < length; i++)
+		{
+			value[i] = readInt();
+		}
+		return value;
+	}
+	/**
+	 * 写出长整形数值
+	 * 
+	 * @param value
+	 *            长整形数值
+	 */
+	public void writeLong(long value)
+	{
+		m_content+=value;
+		m_content+=SEP;
+	}
+
+	/**
+	 * 读取长整形数值，如果读取失败，会返回-1，并产生异常信息
+	 * 
+	 * @return 长整形数值
+	 */
+	public long readLong()
+	{
+		long value = -1;
+		String chunck = nextChunck();
+		if (chunck != null)
+		{
+			try
+			{
+				value = Long.parseLong(chunck);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return value;
+	}
+
+	/**
+	 * 写出长整形数值数组
+	 * 
+	 * @param value
+	 *            长整形数值数组
+	 */
+	public void writeLongs(long value[])
+	{
+		if (value == null)
+		{
+			return;
+		}
+		writeInt(value.length);
+		for (int i = 0; i < value.length; i++)
+		{
+			writeLong(value[i]);
+		}
+	}
+
+	/**
+	 * 读取长整形数值数组
+	 * 
+	 * @param 长整形数组
+	 *            ，如果读取失败则返回空
+	 */
+	public long[] readLongs()
+	{
+		int length = readInt();
+		if (length < 0)
+		{
+			return null;
+		}
+		long[] value = new long[length];
+		for (int i = 0; i < length; i++)
+		{
+			value[i] = readLong();
+		}
+		return value;
+	}
+	/**
+	 * 写出浮点型数值
+	 * 
+	 * @param value
+	 *           浮点型数值
+	 */
+	public void writeFloat(float value)
+	{
+		m_content+=value;
+		m_content+=SEP;
+	}
+
+	/**
+	 * 读取浮点型数值，如果读取失败，会返回-1，并产生异常信息
+	 * 
+	 * @return 浮点型数值
+	 */
+	public float readFloat()
+	{
+		float value = -1;
+		String chunck = nextChunck();
+		if (chunck != null)
+		{
+			try
+			{
+				value = Float.parseFloat(chunck);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return value;
+	}
+
+	/**
+	 * 写出浮点型数值数组
+	 * 
+	 * @param value
+	 *            浮点型数值数组
+	 */
+	public void writeFloats(float value[])
+	{
+		if (value == null)
+		{
+			return;
+		}
+		writeInt(value.length);
+		for (int i = 0; i < value.length; i++)
+		{
+			writeFloat(value[i]);
+		}
+	}
+
+	/**
+	 * 读取浮点型数值数组
+	 * 
+	 * @param 浮点型数组
+	 *            ，如果读取失败则返回空
+	 */
+	public float[] readFloats()
+	{
+		int length = readInt();
+		if (length < 0)
+		{
+			return null;
+		}
+		float[] value = new float[length];
+		for (int i = 0; i < length; i++)
+		{
+			value[i] = readFloat();
+		}
+		return value;
+	}
+
+	/**
+	 * 写出布尔数值
+	 * 
+	 * @param value
+	 *            布尔数值
+	 */
+	public void writeBoolean(boolean value)
+	{
+		m_content+=value ? 1 : 0;
+		m_content+=SEP;
+	}
+
+	/**
+	 * 读取布尔数值
+	 * 
+	 * @param value
+	 *            布尔数值
+	 */
+	public boolean readBoolean()
+	{
+		boolean value = false;
+		String chunck = nextChunck();
+		if (chunck != null)
+		{
+			try
+			{
+				int num = Integer.parseInt(chunck);
+				value = num > 0;
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return value;
+	}
+
+	/**
+	 * 写出布尔数组
+	 * 
+	 * @param value
+	 *            布尔数组
+	 */
+	public void writeBooleans(boolean value[])
+	{
+		if (value == null)
+		{
+			return;
+		}
+		writeInt(value.length);
+		for (int i = 0; i < value.length; i++)
+		{
+			writeBoolean(value[i]);
+		}
+	}
+
+	/**
+	 * 读取布尔数值数组
+	 * 
+	 * @param 布尔数值数组
+	 *            ，如果读取失败则返回空
+	 */
+	public boolean[] readBooleans()
+	{
+		int length = readInt();
+		if (length < 0)
+		{
+			return null;
+		}
+		boolean[] value = new boolean[length];
+		for (int i = 0; i < length; i++)
+		{
+			value[i] = readBoolean();
+		}
+		return value;
+	}
+
+	/**
+	 * 写出字符串数值
+	 * 
+	 * @param value
+	 *            字符串数值
+	 */
+	public void writeString(String value)
+	{
+		m_content+=value;
+		m_content+=SEP;
+	}
+
+	/**
+	 * 读取字符串数值，如果读取失败，会返回null
+	 * 
+	 * @return 整形数值
+	 */
+	public String readString()
+	{
+		return nextChunck();
+	}
+
+	/**
+	 * 写出字符串形数值数组
+	 * 
+	 * @param value
+	 *            字符串数值数组
+	 */
+	public void writeStrings(String value[])
+	{
+		if (value == null)
+		{
+			return;
+		}
+		writeInt(value.length);
+		for (int i = 0; i < value.length; i++)
+		{
+			writeString(value[i]);
+		}
+	}
+
+	/**
+	 * 读取字符串数值数组
+	 * 
+	 * @param 字符串数组
+	 *            ，如果读取失败则返回空
+	 */
+	public String[] readStrings()
+	{
+		int length = readInt();
+		if (length < 0)
+		{
+			return null;
+		}
+		String[] value = new String[length];
+		for (int i = 0; i < length; i++)
+		{
+			value[i] = readString();
+		}
+		return value;
+	}
+	
+	/**
+	 * 获取下一块文本数据
+	 * 
+	 * @return 下一块文本数据
+	 */
+	private String nextChunck()
+	{
+		int len = m_content.length();
+		if (m_readPos >= len)
+		{
+			return null;
+		}
+		int nextEnd = m_content.indexOf(SEP, m_readPos);
+		if (nextEnd < 0)
+		{
+			return null;
+		}
+		String chunck = m_content.substring(m_readPos, nextEnd);
+		m_readPos = nextEnd + 1;
+		return chunck;
+	}
+	/**
+	 * 是否还有数据可以读取
+	 * 
+	 * @return 是否还有数据可以读取
+	 */
+	public boolean canRead()
+	{
+		int len = m_content.length();
+		if (m_readPos >= len)
+		{
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * 检查头数据是否是指定的字符串，注意此过程中会向前读取一个字符串，读取位置也会发生变化。
+	 * 因此再次调用此函数将失效，除非你充值读取位置。头数据用于辨别相同ID情况下，不同的记录。
+	 * 
+	 * @return 是否是指定的字符串
+	 */
+	public boolean checkHeadData(String data)
+	{
+		if(!canRead()||data==null||data.length()==0||m_readPos!=0)
+		{
+			return false;
+		}
+		String next= readString();
+		if(next==null||next.length()==0)
+		{
+			return false;
+		}
+		return next.equals(data);
+	}
+	/**
+	 * 重置读取位置。即将读取位置归零，从头开始读取。
+	 * 如果你需要多次读取同一个记录的话，需要使用到这个函数。
+	 */
+	public void resetReadPos()
+	{
+		m_readPos=0;
+	}
+	/**
+	 * 清空内容数据，并重置读取位置。
+	 */
+	public void clearContent()
+	{
+		m_readPos=0;
+		m_content="";
+	}
+	/**
+	 * 清空内容数据，并重置读取位置。再写入头数据。
+	 * 头数据用于辨别相同ID情况下，不同的记录。
+	 * @param head 头数据
+	 */
+	public void clearContent(String head)
+	{
+		m_readPos=0;
+		m_content="";
+		writeString(head);
+	}
+	/**
+	 * 显示记录内容
+	 */
+	public void logDetail()
+	{
+		C2D_MiscUtil.log("m_recordID:"+m_recordID+",m_desc:"+m_desc+",m_content:"+m_content);
+	}
+}

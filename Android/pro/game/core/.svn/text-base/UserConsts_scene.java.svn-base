@@ -1,0 +1,140 @@
+//◎#include "def.h"
+package game.core;
+public interface UserConsts_scene 
+{
+/*=============================KS数据=============================*/
+public static final String KS_NAME_scene = "scene.bin";
+/*共使用了1190个基础切片单元*/
+/*共创建了119个角色单元*/
+public static final short ACTOR_室外物品_石碑 = 68;
+public static final short ACTOR_室外物品_乌篷船 = 67;
+public static final short ACTOR_室外物品_灌木丛 = 62;
+public static final short ACTOR_室外物品_塔楼 = 60;
+public static final short ACTOR_室外物品_旗帜 = 59;
+public static final short ACTOR_室外物品_栅栏 = 58;
+public static final short ACTOR_室外物品_稻谷流 = 55;
+public static final short ACTOR_室外物品_斜坡 = 54;
+public static final short ACTOR_室外物品_道路铺盖 = 53;
+public static final short ACTOR_室外物品_荷车 = 52;
+public static final short ACTOR_室外物品_边草 = 51;
+public static final short ACTOR_室外物品_稻谷 = 50;
+public static final short ACTOR_室外物品_稻草堆 = 49;
+public static final short ACTOR_室外物品_稻草人 = 47;
+public static final short ACTOR_室外物品_铁砧 = 35;
+public static final short ACTOR_室外物品_铁器 = 34;
+public static final short ACTOR_室外物品_板凳 = 33;
+public static final short ACTOR_室外物品_烟囱 = 32;
+public static final short ACTOR_室外物品_旗杆 = 31;
+public static final short ACTOR_室外物品_水果 = 30;
+public static final short ACTOR_室外物品_衣架 = 29;
+public static final short ACTOR_室外物品_梯子 = 27;
+public static final short ACTOR_室外物品_井 = 26;
+public static final short ACTOR_室外物品_篷子 = 24;
+public static final short ACTOR_室外物品_瀑布 = 6;
+public static final short ACTOR_室外物品_火堆 = 5;
+public static final short ACTOR_室外物品_雪块 = 4;
+public static final short ACTOR_室外物品_山崖 = 3;
+public static final short ACTOR_室外物品_树枝 = 2;
+public static final short ACTOR_室外物品_冰锥 = 1;
+public static final short ACTOR_室外物品_雨棚 = 69;
+public static final short ACTOR_室外物品_大绳索圈 = 70;
+public static final short ACTOR_室外物品_大石头 = 71;
+public static final short ACTOR_室外物品_藤蔓 = 72;
+public static final short ACTOR_室外物品_雪草 = 73;
+public static final short ACTOR_室外物品_石栏 = 75;
+public static final short ACTOR_室外物品_灯笼 = 79;
+public static final short ACTOR_室外物品_假山 = 80;
+public static final short ACTOR_室外物品_烛台 = 81;
+public static final short ACTOR_室外物品_拖车 = 91;
+public static final short ACTOR_室外物品_码头边缘 = 103;
+public static final short ACTOR_室外物品_木桩 = 104;
+public static final short ACTOR_室外物品_船 = 105;
+public static final short ACTOR_室外物品_盆栽 = 110;
+public static final short ACTOR_室外物品_皇城夜灯 = 111;
+public static final short ACTOR_室外物品_飞门 = 112;
+public static final short ACTOR_室外物品_墓碑 = 113;
+public static final short ACTOR_室外物品_风路径 = 114;
+public static final short ACTOR_室外物品_小地图图标 = 115;
+public static final short ACTOR_室外物品_宝箱提示箭头 = 116;
+public static final short ACTOR_共用物品_缸 = 45;
+public static final short ACTOR_共用物品_木柴 = 46;
+public static final short ACTOR_共用物品_筛子 = 44;
+public static final short ACTOR_共用物品_扫帚 = 43;
+public static final short ACTOR_共用物品_箱子 = 42;
+public static final short ACTOR_共用物品_花草 = 41;
+public static final short ACTOR_共用物品_罐子 = 37;
+public static final short ACTOR_共用物品_布袋 = 36;
+public static final short ACTOR_共用物品_木桶 = 28;
+public static final short ACTOR_共用物品_酒坛 = 8;
+public static final short ACTOR_共用物品_宝箱 = 7;
+public static final short ACTOR_共用物品_火架 = 61;
+public static final short ACTOR_共用物品_记录点 = 107;
+public static final short ACTOR_共用物品_小火架 = 108;
+public static final short ACTOR_树_树0 = 0;
+public static final short ACTOR_树_树1 = 25;
+public static final short ACTOR_树_树2 = 63;
+public static final short ACTOR_树_树3 = 64;
+public static final short ACTOR_树_树4 = 65;
+public static final short ACTOR_树_树影子 = 66;
+public static final short ACTOR_树_火树 = 89;
+public static final short ACTOR_树_倒树 = 90;
+public static final short ACTOR_建筑_小帐篷 = 57;
+public static final short ACTOR_建筑_大帐篷 = 56;
+public static final short ACTOR_建筑_房子 = 48;
+public static final short ACTOR_建筑_杂货店 = 40;
+public static final short ACTOR_建筑_打铁铺 = 39;
+public static final short ACTOR_建筑_裁缝店 = 38;
+public static final short ACTOR_建筑_围墙 = 23;
+public static final short ACTOR_建筑_悦来客栈 = 22;
+public static final short ACTOR_建筑_民宅_南 = 9;
+public static final short ACTOR_建筑_变长民宅_南 = 10;
+public static final short ACTOR_建筑_民宅_北 = 11;
+public static final short ACTOR_建筑_变长民宅_北 = 12;
+public static final short ACTOR_建筑_民宅_东 = 13;
+public static final short ACTOR_建筑_变长民宅_东 = 14;
+public static final short ACTOR_建筑_民宅_西 = 15;
+public static final short ACTOR_建筑_变长民宅_西 = 16;
+public static final short ACTOR_建筑_连体民宅_北 = 17;
+public static final short ACTOR_建筑_变长连体民宅_北 = 18;
+public static final short ACTOR_建筑_二层民宅_南 = 19;
+public static final short ACTOR_建筑_变长二层民宅_南 = 20;
+public static final short ACTOR_建筑_襄阳太守府 = 21;
+public static final short ACTOR_建筑_内城墙 = 74;
+public static final short ACTOR_建筑_皇城 = 76;
+public static final short ACTOR_建筑_外城墙 = 77;
+public static final short ACTOR_建筑_内城建筑 = 78;
+public static final short ACTOR_建筑_火烧民宅_南 = 83;
+public static final short ACTOR_建筑_火烧变长民宅_南 = 82;
+public static final short ACTOR_建筑_火烧民宅_北 = 84;
+public static final short ACTOR_建筑_火烧变长民宅_北 = 85;
+public static final short ACTOR_建筑_火烧民宅_东 = 86;
+public static final short ACTOR_建筑_火烧民宅_西 = 87;
+public static final short ACTOR_建筑_火烧二层民宅_南 = 88;
+public static final short ACTOR_建筑_大都建筑_小 = 92;
+public static final short ACTOR_建筑_大都建筑_大 = 93;
+public static final short ACTOR_建筑_大都建筑_城墙 = 94;
+public static final short ACTOR_建筑_大都民房_南 = 95;
+public static final short ACTOR_建筑_大都民房_北 = 96;
+public static final short ACTOR_建筑_大都民房_侧 = 97;
+public static final short ACTOR_建筑_大都马刀商 = 98;
+public static final short ACTOR_建筑_大都布衣贩子 = 99;
+public static final short ACTOR_建筑_大都游脚商 = 100;
+public static final short ACTOR_建筑_大都草原客栈 = 101;
+public static final short ACTOR_建筑_驿站 = 102;
+public static final short ACTOR_建筑_马厩 = 106;
+public static final short ACTOR_地图人物_潮见海 = 109;
+public static final short ACTOR_教程_刀光 = 117;
+public static final short ACTOR_教程_火盆 = 118;
+/*=============================地图数据=============================*/
+/*共创建了2张地图*/
+public static final byte MAP_NAME_自动地形测试 = 0;
+public static final byte MAP_NAME_襄阳_襄阳城 = 1;
+/*=============================脚本数据=============================*/
+public static final short SCRIPT_FUN_PrintString = 0;
+public static final short SCRIPT_FUN_MoveActor = 1;
+public static final short SCRIPT_FUN_PauseFrame = 2;
+/*=============================常量数据=============================*/
+/*ID常量标记(资源文件中不输出)*/
+public static final short FLAG_NPC_Hero = 1000;
+/*=============================属性数据=============================*/
+}
